@@ -206,13 +206,18 @@ namespace GSMLibrary.Tests.Commands.Core
             _mock.Answers.Add("OK");
 
             List<BaseATCommand> zList = new List<BaseATCommand>();
-            zList.Add(new AppModeCommand());
-            zList.Add(new AppModeCommand());
+            AppModeCommand zAppCommand = new AppModeCommand();
+            zList.Add(zAppCommand);
+            AppModeCommand zAppCommand2 = new AppModeCommand();            
+            zList.Add(zAppCommand2);
 
-            CommandResultContainer zResult;
-
-            zResult = base.RunCommands(zList, CommandType.ctRead);
-            Assert.True(zResult.CommonResult);
+            Dictionary<BaseATCommand, bool> zResult;
+            string zErrorMessage = "";
+            zResult = base.RunCommands(zList, CommandType.ctRead, out zErrorMessage);
+            Assert.Equal(2, zResult.Count);
+            Assert.Equal("", zErrorMessage);
+            Assert.True(zResult[zAppCommand]);
+            Assert.True(zResult[zAppCommand2]);
 
             _mock.Answers.Add("OK");
             _mock.Answers.Add("OK");                       
@@ -225,13 +230,18 @@ namespace GSMLibrary.Tests.Commands.Core
             zCommand.DeviceConnectionType = ConnectionType.ACTIVE;
             zList.Add(zCommand);
 
-            zCommand = new AppModeCommand();
-            zCommand.DeviceConnectionMode = ConnectionMode.CSD;
-            zCommand.DeviceConnectionType = ConnectionType.ACTIVE;
-            zList.Add(zCommand);
+            AppModeCommand zCommand2;
+            zCommand2 = new AppModeCommand();
+            zCommand2.DeviceConnectionMode = ConnectionMode.CSD;
+            zCommand2.DeviceConnectionType = ConnectionType.ACTIVE;
+            zList.Add(zCommand2);
 
-            zResult = base.RunCommands(zList, CommandType.ctWrite);
-            Assert.True(zResult.CommonResult);
+            zResult = base.RunCommands(zList, CommandType.ctWrite, out zErrorMessage);
+
+            Assert.Equal(2, zResult.Count);
+            Assert.Equal("", zErrorMessage);
+            Assert.True(zResult[zCommand]);
+            Assert.True(zResult[zCommand2]);
 
             zList.Clear();
             _mock.Answers.Add("OK");
@@ -240,10 +250,14 @@ namespace GSMLibrary.Tests.Commands.Core
 
             RestartCommand zRestCommand = new RestartCommand();            
             zList.Add(zRestCommand);
-            zList.Add(zRestCommand);            
+            RestartCommand zRestCommand2 = new RestartCommand();            
+            zList.Add(zRestCommand2);            
 
-            zResult = base.RunCommands(zList, CommandType.ctRun);
-            Assert.True(zResult.CommonResult);
+            zResult = base.RunCommands(zList, CommandType.ctRun, out zErrorMessage);
+            Assert.Equal(2, zResult.Count);
+            Assert.Equal("", zErrorMessage);
+            Assert.True(zResult[zRestCommand]);
+            Assert.True(zResult[zRestCommand2]);
         }
 
         [Fact]
@@ -254,10 +268,39 @@ namespace GSMLibrary.Tests.Commands.Core
             zList.Add(new AppModeCommand());
             zList.Add(new AppModeCommand());
 
-            CommandResultContainer zResult;
+            Dictionary<BaseATCommand, bool> zResult;
 
-            zResult = base.RunCommands(zList, CommandType.ctRead);
-            Assert.False(zResult.CommonResult);
+            string zErrorMessage = "";
+            zResult = base.RunCommands(zList, CommandType.ctRead, out zErrorMessage);
+            Assert.Equal(0, zResult.Count);
+        }
+
+        [Fact]
+        public void WrongRunCommandTypesCases()
+        {
+            _mock.Answers.Add("OK");
+
+            _mock.Answers.Add("AT+MODE?");
+            _mock.Answers.Add("");
+            _mock.Answers.Add("+MODE: \"GPRS\", \"AWAIT\"");
+            _mock.Answers.Add("OK");
+
+            _mock.Answers.Add("");
+            _mock.Answers.Add("OK");
+
+            List<BaseATCommand> zList = new List<BaseATCommand>();
+            AppModeCommand zAppCommand = new AppModeCommand();
+            zList.Add(zAppCommand);
+            RestartCommand zRestartCommand = new RestartCommand();
+            zList.Add(zRestartCommand);
+
+            Dictionary<BaseATCommand, bool> zResult;
+            string zErrorMessage = "";
+            zResult = base.RunCommands(zList, CommandType.ctRead, out zErrorMessage);
+            Assert.Equal(2, zResult.Count);
+            Assert.Equal("", zErrorMessage);
+            Assert.True(zResult[zAppCommand]);
+            Assert.False(zResult[zRestartCommand]);
         }
     }
 

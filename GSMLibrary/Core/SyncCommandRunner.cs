@@ -13,13 +13,6 @@ namespace GSMLibrary.Core
         ctWrite,
         ctRun
     }
-    
-    public struct CommandResultContainer
-    {
-        public List<BaseATCommand> Commands { get; set; }
-        public string ErrorMessage { get; set; }
-        public bool CommonResult { get; set; }
-    }
 
     public class SyncTrspCommandsRunner : SyncCommandRunner
     {        
@@ -142,11 +135,10 @@ namespace GSMLibrary.Core
             }
         }
 
-        public CommandResultContainer RunCommands(List<BaseATCommand> aCommands, CommandType aType)
-        {
-            CommandResultContainer zResult = new CommandResultContainer();
-            zResult.Commands = aCommands;
-            zResult.CommonResult = true;            
+        public Dictionary<BaseATCommand, bool> RunCommands(List<BaseATCommand> aCommands, CommandType aType, out string aErrorMessage)
+        {            
+            aErrorMessage = "";
+            Dictionary<BaseATCommand, bool> zResult = new Dictionary<BaseATCommand, bool>();
 
             try
             {
@@ -154,44 +146,46 @@ namespace GSMLibrary.Core
 
                 if (DeviceWakeUp())
                 {
-                    foreach (BaseATCommand zCommand in aCommands)
-                    {
+                    foreach (BaseATCommand zCommand in aCommands)                    
+                    {                        
                         switch (aType)
                         {
                             case CommandType.ctRead:
-                                zResult.CommonResult &= RunSingleReadableCommand((IReadableCommand)zCommand);
+                                if (zCommand is IReadableCommand)
+                                    zResult[zCommand] = RunSingleReadableCommand((IReadableCommand)zCommand);
+                                else
+                                    zResult[zCommand] = false;
                                 break;
                             case CommandType.ctWrite:
-                                zResult.CommonResult &= RunSingleWritableCommand((IWritableCommand)zCommand);
+                                if (zCommand is IWritableCommand)
+                                    zResult[zCommand] = RunSingleWritableCommand((IWritableCommand)zCommand);
+                                else
+                                    zResult[zCommand] = false;
                                 break;
                             case CommandType.ctRun:
-                                zResult.CommonResult &= RunSingleRunnableCommand((IRunnableComand)zCommand);
+                                if (zCommand is IRunnableComand)
+                                    zResult[zCommand] = RunSingleRunnableCommand((IRunnableComand)zCommand);
+                                else
+                                    zResult[zCommand] = false;
                                 break;
                             default:
-                                zResult.ErrorMessage = "Неизвестный тип команды";
-                                zResult.CommonResult = false;
+                                aErrorMessage = "Неизвестный тип команды";
                                 break;
                         }
                     }
 
-                    _communicatorInstance.Deactivate();
-
-                    zResult.ErrorMessage = "";
+                    _communicatorInstance.Deactivate();                    
                     return zResult; ;
                 }
                 else
-                {
-                    zResult.CommonResult = false;
-                    zResult.Commands.Clear();
-                    zResult.ErrorMessage = "Нет ответа от устройства";
+                {                    
+                    aErrorMessage = "Нет ответа от устройства";
                     return zResult;
                 }
             }
             catch (Exception zException)
             {
-                zResult.ErrorMessage = zException.Message;
-                zResult.Commands.Clear();
-                zResult.CommonResult = false;
+                aErrorMessage = zException.Message;                
             }
 
             return zResult;
