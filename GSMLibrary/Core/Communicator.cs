@@ -124,9 +124,11 @@ namespace GSMLibrary.Core
             try
             {
                 LoadSettings();
-                
+                                
                 if (_serialPort.IsOpen)
                     _serialPort.Close();
+
+                ApplyPortSettings();
 
                 _serialPort.Open();
 
@@ -151,6 +153,8 @@ namespace GSMLibrary.Core
                 _serialPort.Parity = _serialSettings.Parity;
                 _serialPort.PortName = _serialSettings.PortName;
                 _serialPort.StopBits = _serialSettings.StopBits;
+
+                _serialPort.NewLine = "\r\n";
 
                 _serialPort.Open();
             }
@@ -198,7 +202,7 @@ namespace GSMLibrary.Core
             {
                 FileStream zReader = new FileStream("Config\\PortSettings.xml", FileMode.OpenOrCreate);
                 Communicator.Instance._serialSettings = (SerialPortSettings)serializer.Deserialize(zReader);
-                zReader.Close();
+                zReader.Close();                
 
                 return true;
             }

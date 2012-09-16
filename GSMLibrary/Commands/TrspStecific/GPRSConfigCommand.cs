@@ -19,6 +19,7 @@ namespace GSMLibrary.Commands.TrspSpecific
         public GPRSConfigCommand()
         {            
             CommandPrefix = "GPRSCONFIG";
+            _IPAdressprop = IPAddress.Parse("127.0.0.1");
         }
         
         private String _APNName;

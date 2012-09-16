@@ -14,7 +14,7 @@ namespace GSMLibrary.Commands
     public class BaseReadableCommand : BaseATCommand, IReadableCommand
     {
         public virtual bool ClarifyAnswer(List<string> aAnswer)
-        {
+        {   
             if (aAnswer.Contains("OK"))
             {
                 aAnswer.RemoveAll(OKString);
@@ -32,7 +32,7 @@ namespace GSMLibrary.Commands
                 return false;
         }
 
-        // Search predicate returns true if a string ends in "saurus".
+        // Search predicate returns true if a string ends in "OK".
         protected static bool OKString(String s)
         {
             return s.ToUpper().Equals("OK");

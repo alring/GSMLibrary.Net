@@ -45,10 +45,11 @@ namespace GSMLibrary.Core
 
         protected virtual bool DeviceWakeUp()
         {            
-            _communicatorInstance.WriteLine("AT");
             //_communicatorInstance.ReadTimeout = 2000;
             try
             {
+                _communicatorInstance.WriteLine("AT");
+
                 string zAnswer = "";
                 while (!BaseATCommand.PositiveAnswer(zAnswer))
                 {
