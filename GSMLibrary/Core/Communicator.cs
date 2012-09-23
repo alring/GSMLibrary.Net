@@ -110,6 +110,8 @@ namespace GSMLibrary.Core
         private Communicator() 
         {
             _serialPort = new SerialPort();
+
+            _serialPort.ReadTimeout = 2000;
             
             _serialSettings = new SerialPortSettings();
             _serialSettings.BaudRate = _serialPort.BaudRate;
