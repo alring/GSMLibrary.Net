@@ -19,7 +19,7 @@ namespace GSMLibrary.Commands
 
         public static bool PositiveAnswer(string aAnswer)
         {
-            return aAnswer.Contains("OK");
+            return aAnswer.Equals("OK");
         }
 
         public static bool CheckCommandAnswer(string aAnswer)

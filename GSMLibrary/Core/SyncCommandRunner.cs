@@ -100,12 +100,14 @@ namespace GSMLibrary.Core
                 _communicatorInstance.WriteLine(aCommand.WriteCommand());
 
                 string zAnswerLine = "";
+                bool zResult = false;
                 while (!BaseATCommand.CheckCommandAnswer(zAnswerLine))
                 {
-                    zAnswerLine = _communicatorInstance.ReadLine();                    
+                    zAnswerLine = _communicatorInstance.ReadLine();
+                    zResult = zResult || BaseATCommand.PositiveAnswer(zAnswerLine);
                 }
 
-                return true;
+                return zResult;
             }
             catch (Exception)
             {
