@@ -22,8 +22,8 @@ namespace GSMLibrary.Tests.Commands
 
             List<string> zList = new List<string>();
 
-            zList.Add("AT+IMEI?");
-            zList.Add("+IMEI: 123456789012345");
+            zList.Add("AT+WIMEI?");
+            zList.Add("+WIMEI: 123456789012345");
             zList.Add("OK");            
 
             zResult = _IMEICommand.Parse(zList);
@@ -36,7 +36,7 @@ namespace GSMLibrary.Tests.Commands
         {
             List<string> zList = new List<string>();
 
-            zList.Add("+IME: 123456789012345");
+            zList.Add("+WIME: 123456789012345");
             zList.Add("OK");
                         
             Assert.False(_IMEICommand.Parse(zList));
@@ -47,7 +47,7 @@ namespace GSMLibrary.Tests.Commands
         {
             List<string> zList = new List<string>();
 
-            zList.Add("+IMEI: 123456789012345, 3423");
+            zList.Add("+WIMEI: 123456789012345, 3423");
             zList.Add("OK");
 
             Assert.False(_IMEICommand.Parse(zList));
@@ -58,13 +58,13 @@ namespace GSMLibrary.Tests.Commands
         {
             List<string> zList = new List<string>();
 
-            zList.Add("+IMEI: 13423456789012345");
+            zList.Add("+WIMEI: 13423456789012345");
             zList.Add("OK");
 
             Assert.False(_IMEICommand.Parse(zList));
 
             zList.Clear();
-            zList.Add("+IMEI: 1342345678901234545446546546464646949646354654646547987946465465987");
+            zList.Add("+WIMEI: 1342345678901234545446546546464646949646354654646547987946465465987");
             zList.Add("OK");
 
             Assert.False(_IMEICommand.Parse(zList));
@@ -73,7 +73,7 @@ namespace GSMLibrary.Tests.Commands
         [Fact]
         public void ReadCommandTest()
         {
-            Assert.Equal("AT+IMEI?", _IMEICommand.ReadParamsCommand());
+            Assert.Equal("AT+WIMEI?", _IMEICommand.ReadParamsCommand());
         }
     }
 }

@@ -10,7 +10,7 @@ namespace GSMLibrary.Commands
     {
         public IMEICommand()
         {
-            CommandPrefix = "IMEI";
+            CommandPrefix = "WIMEI";
         }
 
         public String DeviceIMEI { get; set; }        
