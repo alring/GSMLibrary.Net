@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Text;
 using GSMLibrary.Commands;
+using NLog;
 
 namespace GSMLibrary.Core
 {   
@@ -18,6 +19,8 @@ namespace GSMLibrary.Core
     {        
         protected override bool DeviceWakeUp()
         {
+            _logger.Debug("Try to special Device wake up");
+
             byte[] zExitCommand = Encoding.Default.GetBytes("exit");
 
             _communicatorInstance.Write(zExitCommand, 0, zExitCommand.Length);
@@ -32,9 +35,12 @@ namespace GSMLibrary.Core
     public class SyncCommandRunner
     {
         protected ICommunicator _communicatorInstance;
+        protected Logger _logger;
 
         public SyncCommandRunner()
         {
+            _logger = LogManager.GetCurrentClassLogger();
+            _logger.Debug("Try to Get Communicator");
             _communicatorInstance = (ICommunicator) Communicator.Instance;
         }
         
@@ -44,8 +50,8 @@ namespace GSMLibrary.Core
         }
 
         protected virtual bool DeviceWakeUp()
-        {            
-            //_communicatorInstance.ReadTimeout = 2000;
+        {
+            _logger.Debug("Try to Device wake up");
             try
             {
                 _communicatorInstance.WriteLine("AT");
@@ -55,11 +61,13 @@ namespace GSMLibrary.Core
                 {
                     zAnswer = _communicatorInstance.ReadLine();
                 }
-
+                
+                _logger.Debug("Device wake up OK");
                 return true;
             }
-            catch (Exception)
-            {                
+            catch (Exception zException)
+            {
+                _logger.WarnException("Failed Device wake up", zException);
                 return false;
             }
         }
@@ -81,11 +89,13 @@ namespace GSMLibrary.Core
                     zAnswerLine = _communicatorInstance.ReadLine();
                     zAnswerList.Add(zAnswerLine);
                 }
-                
+
+                _logger.Debug("Correct Answer received. Try to parse it");
                 return aCommand.Parse(zAnswerList);                
             }
-            catch (Exception)
+            catch (Exception zException)
             {
+                _logger.WarnException("Failed Single command run", zException);
                 return false;
             }
         }
@@ -107,10 +117,12 @@ namespace GSMLibrary.Core
                     zResult = zResult || BaseATCommand.PositiveAnswer(zAnswerLine);
                 }
 
+                _logger.Debug("Correct Answer received OK");
                 return zResult;
             }
-            catch (Exception)
+            catch (Exception zException)
             {
+                _logger.WarnException("Failed Single command run", zException);
                 return false;
             }
         }
@@ -130,10 +142,12 @@ namespace GSMLibrary.Core
                     zAnswerLine = _communicatorInstance.ReadLine();                    
                 }
 
+                _logger.Debug("Correct Answer received OK");
                 return BaseATCommand.PositiveAnswer(zAnswerLine);
             }
-            catch (Exception)
+            catch (Exception zException)
             {
+                _logger.WarnException("Failed Single command run", zException);
                 return false;
             }
         }
@@ -154,24 +168,28 @@ namespace GSMLibrary.Core
                         switch (aType)
                         {
                             case CommandType.ctRead:
+                                _logger.Debug("readable command");
                                 if (zCommand is IReadableCommand)
                                     zResult[zCommand] = RunSingleReadableCommand((IReadableCommand)zCommand);
                                 else
                                     zResult[zCommand] = false;
                                 break;
                             case CommandType.ctWrite:
+                                _logger.Debug("writable command");
                                 if (zCommand is IWritableCommand)
                                     zResult[zCommand] = RunSingleWritableCommand((IWritableCommand)zCommand);
                                 else
                                     zResult[zCommand] = false;
                                 break;
                             case CommandType.ctRun:
+                                _logger.Debug("runnable command");
                                 if (zCommand is IRunnableComand)
                                     zResult[zCommand] = RunSingleRunnableCommand((IRunnableComand)zCommand);
                                 else
                                     zResult[zCommand] = false;
                                 break;
                             default:
+                                _logger.Debug("Unknown command type");
                                 aErrorMessage = "Неизвестный тип команды";
                                 break;
                         }
@@ -181,13 +199,15 @@ namespace GSMLibrary.Core
                     return zResult; ;
                 }
                 else
-                {                    
+                {
+                    _logger.Debug("No answer");
                     aErrorMessage = "Нет ответа от устройства";
                     return zResult;
                 }
             }
             catch (Exception zException)
             {
+                _logger.WarnException("Handled exception", zException);
                 aErrorMessage = zException.Message;                
             }
 

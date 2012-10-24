@@ -21,9 +21,9 @@ namespace GSMLibrary.Commands.TrspSpecific
         {
             if (base.Parse(aAnswer))
             {   
-                string[] zSplit = aAnswer[0].Split(new Char[] { ':', ',' });                
-                if (zSplit.Count()  == 7)
-                {                    
+                string[] zSplit = aAnswer[0].Split(new Char[] { ':', ',' });
+                if (zSplit.Count() == 7)
+                {
                     try
                     {
                         RTSSignalEnabled = FlowControlCommand.EncodeValue(ushort.Parse(TrimValue(zSplit[4])));
@@ -32,13 +32,17 @@ namespace GSMLibrary.Commands.TrspSpecific
 
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception zException)
                     {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;
@@ -73,20 +77,20 @@ namespace GSMLibrary.Commands.TrspSpecific
         {
             if (base.Parse(aAnswer))
             {
-                string[] zSplit = aAnswer[0].Split(new Char[] { ':', ',' });                
+                string[] zSplit = aAnswer[0].Split(new Char[] { ':', ',' });
                 if (zSplit.Count() >= 5)
-                {                    
+                {
                     try
                     {
                         ushort zBits = ushort.Parse(TrimValue(zSplit[2]));
                         ushort zParity = ushort.Parse(TrimValue(zSplit[3]));
 
                         ushort zUartDataBits = 0;
-                        StopBits zUartStopBits = StopBits.One;                        
+                        StopBits zUartStopBits = StopBits.One;
 
                         if (!CharacterFramingCommand.StopBitsEncode(zBits, out zUartDataBits, out zUartStopBits))
-                            return false;                        
-                        
+                            return false;
+
                         UARTBaudRate = UInt32.Parse(TrimValue(zSplit[1]));
                         UARTDataBits = zUartDataBits;
                         UARTParity = CharacterFramingCommand.ParityEncode(zParity);
@@ -95,13 +99,17 @@ namespace GSMLibrary.Commands.TrspSpecific
 
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception zException)
                     {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;

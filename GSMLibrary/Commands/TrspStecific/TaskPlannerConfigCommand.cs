@@ -51,10 +51,10 @@ namespace GSMLibrary.Commands.TrspSpecific
                 {
                     try
                     {
-                        string zSyncMode = TrimValue(zSplit[1]);                        
+                        string zSyncMode = TrimValue(zSplit[1]);
 
                         WindowOpenTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(zSplit[2]), int.Parse(zSplit[3]), 0);
-                        ActivityPeriod = new TimeSpan(int.Parse(zSplit[4]), int.Parse(zSplit[5]), 00);                        
+                        ActivityPeriod = new TimeSpan(int.Parse(zSplit[4]), int.Parse(zSplit[5]), 00);
 
                         switch (int.Parse(zSyncMode))
                         {
@@ -63,18 +63,22 @@ namespace GSMLibrary.Commands.TrspSpecific
                             case 1: DeviceSyncMode = SyncMode.OperatorSync;
                                 break;
                             default:
-                                return false;                         
+                                return false;
                         }
 
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception zException)
                     {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;

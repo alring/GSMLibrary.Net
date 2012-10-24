@@ -40,6 +40,12 @@ namespace GSMLibrary.Commands
 
         public virtual bool Parse(List<string> aAnswer)
         {
+            _logger.Debug("Parse command");
+            foreach (string zString in aAnswer)
+            {
+                _logger.Debug(zString);
+            }
+
             if (aAnswer.Contains(BASE_ERROR))
                 return false;
             else

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NLog;
 
 namespace GSMLibrary.Commands
 {
@@ -11,6 +12,12 @@ namespace GSMLibrary.Commands
         public const string BASE_ERROR = "ERROR";
 
         protected String CommandPrefix;
+        protected Logger _logger;
+
+        public BaseATCommand()
+        {
+            _logger = LogManager.GetCurrentClassLogger();
+        }
 
         public static String TrimValue(String aValue)
         {

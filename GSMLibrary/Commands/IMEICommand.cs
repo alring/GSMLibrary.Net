@@ -32,7 +32,10 @@ namespace GSMLibrary.Commands
                         return false;
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;

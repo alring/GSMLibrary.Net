@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using NLog;
 
 namespace GSMLibrary.Core
 {
@@ -46,6 +47,7 @@ namespace GSMLibrary.Core
         private static readonly Communicator instance = new Communicator();
         private SerialPort _serialPort;
         private SerialPortSettings _serialSettings;
+        private Logger _logger;
         
         public int BaudRate 
         {
@@ -119,6 +121,8 @@ namespace GSMLibrary.Core
             _serialSettings.Parity = _serialPort.Parity;
             _serialSettings.PortName = _serialPort.PortName;
             _serialSettings.StopBits = _serialPort.StopBits;
+
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         public bool Activate()
@@ -144,6 +148,7 @@ namespace GSMLibrary.Core
         
         public void ApplyPortSettings() 
         {
+            _logger.Debug("ApplyPortSettings Start");
             try
             {
                 //LoadSettings();
@@ -158,24 +163,32 @@ namespace GSMLibrary.Core
 
                 _serialPort.NewLine = "\r\n";
 
+                _logger.Debug("Try to Open Serial Port");
                 _serialPort.Open();
             }
-            catch (Exception)
+            catch (Exception zException)
             {
-                //
+                _logger.WarnException("Handled exception", zException);
             }
+            _logger.Debug("ApplyPortSettings OK");
         }
 
         public void Deactivate()
         {
             try
             {
+                _logger.Debug("Deactivate Start");
                 if (_serialPort.IsOpen)
+                {
+                    _logger.Debug("Try to Close Serial Port");
                     _serialPort.Close();
+                }
+                else
+                    _logger.Debug("No need to Close; Serial Port Was Not opened");
             }
-            catch (Exception)
+            catch (Exception zException)
             {
-                //dummy
+                _logger.WarnException("Handled exception", zException);
             }
         }
 
@@ -186,7 +199,10 @@ namespace GSMLibrary.Core
 
         public string ReadLine()
         {
-            return _serialPort.ReadLine();
+            string zResult = _serialPort.ReadLine();
+            _logger.Info("Read New Line : {0}", zResult);
+            _logger.Debug("HEX string: {0}", zResult.ToCharArray().ToString());
+            return zResult;
         }        
 
         public static Communicator Instance
@@ -199,23 +215,31 @@ namespace GSMLibrary.Core
 
         public bool LoadSettings()
         {
+            Logger zlogger = LogManager.GetCurrentClassLogger();
+            zlogger.Debug("LoadSettings Start");
+
             XmlSerializer serializer = new XmlSerializer(typeof(SerialPortSettings));
             try
             {
                 FileStream zReader = new FileStream("Config\\PortSettings.xml", FileMode.OpenOrCreate);
                 Communicator.Instance._serialSettings = (SerialPortSettings)serializer.Deserialize(zReader);
-                zReader.Close();                
+                zReader.Close();
 
+                zlogger.Info("LoadSettings OK");
                 return true;
             }
-            catch (Exception)
+            catch (Exception zException)
             {
+                zlogger.WarnException("Handled exception", zException);
                 return false;
             }
 
         }
 
-        public bool SaveSettings() {            
+        public bool SaveSettings() {
+            Logger zlogger = LogManager.GetCurrentClassLogger();
+            zlogger.Debug("SaveSettings Start");
+            
             XmlSerializer serializer = new XmlSerializer(typeof(SerialPortSettings));
 
             try
@@ -226,21 +250,26 @@ namespace GSMLibrary.Core
                 serializer.Serialize(zWriter, Communicator.Instance._serialSettings);
                 zWriter.Close();
 
+                zlogger.Info("SaveSettings OK");
                 return true;
             }
-            catch (Exception)
+            catch (Exception zException)
             {
+                zlogger.WarnException("Handled exception", zException);
                 return false;
             }
         }
 
         public void Write(byte[] buffer, int offset, int count)
         {
+            _logger.Info("Write buffer: {0}, offset: {1}, count: {2}", BitConverter.ToString(buffer).Replace("-", " 0x"), offset.ToString(), count.ToString());
             _serialPort.Write(buffer, offset, count);
         }
 
         public void WriteLine(string text)
         {
+            _logger.Info("Write New Line: {0}", text);
+            _logger.Debug("HEX string: {0}", BitConverter.ToString(text.ToCharArray()).ToString());
             _serialPort.WriteLine(text);
         }
     }

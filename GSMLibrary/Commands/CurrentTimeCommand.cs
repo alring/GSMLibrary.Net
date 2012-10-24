@@ -24,16 +24,20 @@ namespace GSMLibrary.Commands
                     try
                     {
                         DeviceDateTime = new DateTime(2000 + int.Parse(TrimValue(zSplit[1])), int.Parse(TrimValue(zSplit[2])), int.Parse(TrimValue(zSplit[3])),
-                            int.Parse(TrimValue(zSplit[4])), int.Parse(TrimValue(zSplit[5])), int.Parse(TrimValue(zSplit[6])));                        
+                            int.Parse(TrimValue(zSplit[4])), int.Parse(TrimValue(zSplit[5])), int.Parse(TrimValue(zSplit[6])));
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception zException)
                     {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;

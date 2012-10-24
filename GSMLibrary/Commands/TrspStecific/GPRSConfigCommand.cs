@@ -131,16 +131,20 @@ namespace GSMLibrary.Commands.TrspSpecific
                         _ServerPort = ushort.Parse(zSplit[4]);
                         _IPAdressprop = IPAddress.Parse(TrimValue(zSplit[5]));
                         _DataCenterPort = ushort.Parse(zSplit[6]);
-                        
+
                         return true;
                     }
-                    catch (Exception)
-                    {                        
+                    catch (Exception zException)
+                    {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;

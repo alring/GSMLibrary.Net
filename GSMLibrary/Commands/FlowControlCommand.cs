@@ -57,13 +57,17 @@ namespace GSMLibrary.Commands
 
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception zException)
                     {
+                        _logger.WarnException("Handled exception", zException);
                         return false;
                     }
                 }
                 else
+                {
+                    _logger.Debug("InCorrect Params Count: {0}", zSplit.Count());
                     return false;
+                }
             }
             else
                 return false;
