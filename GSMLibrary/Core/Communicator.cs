@@ -169,6 +169,7 @@ namespace GSMLibrary.Core
             catch (Exception zException)
             {
                 _logger.WarnException("Handled exception", zException);
+                _logger.Warn(zException.ToString());
             }
             _logger.Debug("ApplyPortSettings OK");
         }
@@ -269,7 +270,7 @@ namespace GSMLibrary.Core
         public void WriteLine(string text)
         {
             _logger.Info("Write New Line: {0}", text);
-            _logger.Debug("HEX string: {0}", BitConverter.ToString(text.ToCharArray()).ToString());
+            //_logger.Debug("HEX string: {0}", BitConverter.ToString(text.ToCharArray()).ToString());
             _serialPort.WriteLine(text);
         }
     }

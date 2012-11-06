@@ -15,8 +15,12 @@ namespace GSMLibrary.Core
         ctRun
     }
 
+    public delegate void ObservePickUp();
+
     public class SyncTrspCommandsRunner : SyncCommandRunner
-    {        
+    {
+        public ObservePickUp ObservePickUpDelegate;
+        
         protected override bool DeviceWakeUp()
         {
             _logger.Debug("Try to special Device wake up");
@@ -29,6 +33,69 @@ namespace GSMLibrary.Core
             Thread.Sleep(500);
 
             return base.DeviceWakeUp();
+        }
+        
+        protected bool TryDataBits(List<int> aDataBits, List<System.IO.Ports.Parity> aParities, List<System.IO.Ports.StopBits> aStopBits)
+        {
+            foreach (int dataBits in aDataBits)
+            {
+                Communicator.Instance.DataBits = dataBits;
+                if (TryParity(aParities, aStopBits))
+                    return true;
+            }
+            return false;
+        }
+
+        protected bool TryParity(List<System.IO.Ports.Parity> aParities, List<System.IO.Ports.StopBits> aStopBits)
+        {
+            foreach (System.IO.Ports.Parity parity in aParities)
+            {
+                Communicator.Instance.Parity = parity;
+                if (TryStopBits(aStopBits))
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected bool TryStopBits(List<System.IO.Ports.StopBits> aStopBits)
+        {
+            foreach (System.IO.Ports.StopBits stopBits in aStopBits)
+            {
+                Communicator.Instance.StopBits = stopBits;
+                Communicator.Instance.ApplyPortSettings();
+
+                // указываем на следующую попытку разбудить устройство
+                ObservePickUpDelegate();
+
+                try
+                {
+                    bool zResult = DeviceWakeUp();
+                    Communicator.Instance.Deactivate();
+                    if (zResult)
+                        return true;
+                }
+                catch (Exception zException)
+                {
+                    _logger.WarnException("Failed Device wake up", zException);
+                    return false;
+                }
+                    
+            }
+
+            return false;
+        }
+
+        public bool PickUpSettings(List<int> aBaudrate, List<int> aDataBits, List<System.IO.Ports.Parity> aParities, List<System.IO.Ports.StopBits> aStopBits)
+        {
+            foreach (int baudRate in aBaudrate)
+            {
+                Communicator.Instance.BaudRate = baudRate;
+                if (TryDataBits(aDataBits, aParities, aStopBits))
+                    return true;
+            }
+
+            return false;
         }
     }
 
