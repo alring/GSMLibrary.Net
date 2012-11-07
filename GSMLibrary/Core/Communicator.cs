@@ -24,7 +24,7 @@ namespace GSMLibrary.Core
 
     public interface ICommunicator
     {
-        bool Activate();
+        bool Activate(bool aForceSettings = true);
 
         void ApplyPortSettings();
 
@@ -125,11 +125,12 @@ namespace GSMLibrary.Core
             _logger = LogManager.GetCurrentClassLogger();
         }
 
-        public bool Activate()
+        public bool Activate(bool aForceSettings = true)
         {
             try
             {
-                LoadSettings();
+                if (aForceSettings)
+                    LoadSettings();
                                 
                 if (_serialPort.IsOpen)
                     _serialPort.Close();

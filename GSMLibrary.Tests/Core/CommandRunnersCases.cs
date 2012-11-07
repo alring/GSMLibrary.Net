@@ -20,7 +20,7 @@ namespace GSMLibrary.Tests.Commands.Core
             Commands = new List<string>();
         }
 
-        public bool Activate()
+        public bool Activate(bool aForceSettings = true)
         {
             return true;
         }

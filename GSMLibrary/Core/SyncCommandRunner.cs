@@ -219,14 +219,14 @@ namespace GSMLibrary.Core
             }
         }
 
-        public Dictionary<BaseATCommand, bool> RunCommands(List<BaseATCommand> aCommands, CommandType aType, out string aErrorMessage)
+        public Dictionary<BaseATCommand, bool> RunCommands(List<BaseATCommand> aCommands, CommandType aType, out string aErrorMessage, bool aForceSettings = true)
         {            
             aErrorMessage = "";
             Dictionary<BaseATCommand, bool> zResult = new Dictionary<BaseATCommand, bool>();
 
             try
             {
-                _communicatorInstance.Activate();
+                _communicatorInstance.Activate(aForceSettings);
 
                 if (DeviceWakeUp())
                 {
