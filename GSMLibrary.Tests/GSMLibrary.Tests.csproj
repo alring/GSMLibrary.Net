@@ -75,6 +75,7 @@
     <Compile Include="Commands\MasterPasswordCases.cs" />
     <Compile Include="Commands\ModbusPasswordCases.cs" />
     <Compile Include="Commands\RestartCommandCases.cs" />
+    <Compile Include="Commands\SignalQualityCommandCases.cs" />
     <Compile Include="Commands\UartConfigCases.cs" />
     <Compile Include="Core\CommandRunnersCases.cs" />
     <Compile Include="Core\CommunicatorTests.cs" />

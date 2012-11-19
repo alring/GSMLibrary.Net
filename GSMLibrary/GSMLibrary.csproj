@@ -51,6 +51,7 @@
     <Compile Include="Commands\IMEICommand.cs" />
     <Compile Include="Commands\IWritableCommand.cs" />
     <Compile Include="Commands\SerialNumberCommand.cs" />
+    <Compile Include="Commands\SignalQualityCommand.cs" />
     <Compile Include="Commands\TrspStecific\AppModeCommand.cs" />
     <Compile Include="Commands\TrspStecific\BasePasswordCommand.cs" />
     <Compile Include="Commands\TrspStecific\GPRSConfigCommand.cs" />
